@@ -12,7 +12,7 @@ from .managers import UserManager
 
 class User(AbstractUser):
     """
-    Default custom user model for Mind You Logs.
+    Default custom user model for Mock Logs.
     If adding fields that need to be filled at user signup,
     check forms.SignupForm and forms.SocialSignupForms accordingly.
     """

@@ -4,7 +4,7 @@ from factory import Faker
 from factory import post_generation
 from factory.django import DjangoModelFactory
 
-from mindyou_logs.users.models import User
+from mock_logs.users.models import User
 
 
 class UserFactory(DjangoModelFactory[User]):

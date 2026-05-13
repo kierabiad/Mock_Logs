@@ -1,5 +1,5 @@
 """
-WSGI config for Mind You Logs project.
+WSGI config for Mock Logs project.
 
 This module contains the WSGI application used by Django's development server
 and any production WSGI deployments. It should expose a module-level variable
@@ -21,9 +21,9 @@ from pathlib import Path
 from django.core.wsgi import get_wsgi_application
 
 # This allows easy placement of apps within the interior
-# mindyou_logs directory.
+# mock_logs directory.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
-sys.path.append(str(BASE_DIR / "mindyou_logs"))
+sys.path.append(str(BASE_DIR / "mock_logs"))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.production")
 
 # This application object is used by any WSGI server configured to use this

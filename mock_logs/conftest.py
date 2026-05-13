@@ -1,7 +1,7 @@
 import pytest
 
-from mindyou_logs.users.models import User
-from mindyou_logs.users.tests.factories import UserFactory
+from mock_logs.users.models import User
+from mock_logs.users.tests.factories import UserFactory
 
 
 @pytest.fixture(autouse=True)

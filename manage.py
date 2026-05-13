@@ -20,9 +20,9 @@ def main():
         ) from exc
 
     # This allows easy placement of apps within the interior
-    # mindyou_logs directory.
+    # mock_logs directory.
     current_path = Path(__file__).parent.resolve()
-    sys.path.append(str(current_path / "mindyou_logs"))
+    sys.path.append(str(current_path / "mock_logs"))
 
     execute_from_command_line(sys.argv)
 

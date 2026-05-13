@@ -28,7 +28,7 @@ django.setup()
 
 # -- Project information -----------------------------------------------------
 
-project = "Mind You Logs"
+project = "Mock Logs"
 copyright = """2026, Kier Abiad"""  # noqa: A001
 author = "Kier Abiad"
 

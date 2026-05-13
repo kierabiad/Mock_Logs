@@ -1,4 +1,4 @@
-# Translations for the Mind You Logs project
+# Translations for the Mock Logs project
 # Copyright (C) 2026 Kier Abiad
 # Kier Abiad <tech.intern.3@mindyou.com.ph>, 2026.
 #

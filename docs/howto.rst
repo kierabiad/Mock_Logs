@@ -4,7 +4,7 @@ How To - Project Documentation
 Get Started
 ----------------------------------------------------------------------
 
-Documentation can be written as rst files in `mindyou_logs/docs`.
+Documentation can be written as rst files in `mock_logs/docs`.
 
 
 To build and serve docs, use the commands::

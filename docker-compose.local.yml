@@ -1,15 +1,15 @@
 volumes:
-  mindyou_logs_local_postgres_data: {}
-  mindyou_logs_local_postgres_data_backups: {}
-  mindyou_logs_local_redis_data: {}
+  mock_logs_local_postgres_data: {}
+  mock_logs_local_postgres_data_backups: {}
+  mock_logs_local_redis_data: {}
 
 services:
   django: &django
     build:
       context: .
       dockerfile: ./compose/local/django/Dockerfile
-    image: mindyou_logs_local_django
-    container_name: mindyou_logs_local_django
+    image: mock_logs_local_django
+    container_name: mock_logs_local_django
     depends_on:
       - postgres
       - redis
@@ -28,30 +28,30 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
-    image: mindyou_logs_production_postgres
-    container_name: mindyou_logs_local_postgres
+    image: mock_logs_production_postgres
+    container_name: mock_logs_local_postgres
     volumes:
-      - mindyou_logs_local_postgres_data:/var/lib/postgresql/data
-      - mindyou_logs_local_postgres_data_backups:/backups
+      - mock_logs_local_postgres_data:/var/lib/postgresql/data
+      - mock_logs_local_postgres_data_backups:/backups
     env_file:
       - ./.envs/.local/.postgres
 
   mailpit:
     image: docker.io/axllent/mailpit:latest
-    container_name: mindyou_logs_local_mailpit
+    container_name: mock_logs_local_mailpit
     ports:
       - "8025:8025"
 
   redis:
     image: docker.io/redis:7.2
-    container_name: mindyou_logs_local_redis
+    container_name: mock_logs_local_redis
     volumes:
-      - mindyou_logs_local_redis_data:/data
+      - mock_logs_local_redis_data:/data
 
   celeryworker:
     <<: *django
-    image: mindyou_logs_local_celeryworker
-    container_name: mindyou_logs_local_celeryworker
+    image: mock_logs_local_celeryworker
+    container_name: mock_logs_local_celeryworker
     depends_on:
       - redis
       - postgres
@@ -61,8 +61,8 @@ services:
 
   celerybeat:
     <<: *django
-    image: mindyou_logs_local_celerybeat
-    container_name: mindyou_logs_local_celerybeat
+    image: mock_logs_local_celerybeat
+    container_name: mock_logs_local_celerybeat
     depends_on:
       - redis
       - postgres
@@ -72,8 +72,8 @@ services:
 
   flower:
     <<: *django
-    image: mindyou_logs_local_flower
-    container_name: mindyou_logs_local_flower
+    image: mock_logs_local_flower
+    container_name: mock_logs_local_flower
     ports:
       - '5555:5555'
     command: /start-flower

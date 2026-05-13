@@ -7,7 +7,7 @@ from django.views.generic import DetailView
 from django.views.generic import RedirectView
 from django.views.generic import UpdateView
 
-from mindyou_logs.users.models import User
+from mock_logs.users.models import User
 
 
 class UserDetailView(LoginRequiredMixin, DetailView):

@@ -1,7 +1,7 @@
 from django.urls import resolve
 from django.urls import reverse
 
-from mindyou_logs.users.models import User
+from mock_logs.users.models import User
 
 
 def test_detail(user: User):

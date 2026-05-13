@@ -7,8 +7,8 @@ from pathlib import Path
 import environ
 
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
-# mindyou_logs/
-APPS_DIR = BASE_DIR / "mindyou_logs"
+# mock_logs/
+APPS_DIR = BASE_DIR / "mock_logs"
 env = environ.Env()
 
 READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
@@ -86,7 +86,7 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    "mindyou_logs.users",
+    "mock_logs.users",
     "logs",
     # Your stuff: custom apps go here
 ]
@@ -96,7 +96,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # MIGRATIONS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#migration-modules
-MIGRATION_MODULES = {"sites": "mindyou_logs.contrib.sites.migrations"}
+MIGRATION_MODULES = {"sites": "mock_logs.contrib.sites.migrations"}
 
 # AUTHENTICATION
 # ------------------------------------------------------------------------------
@@ -192,7 +192,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
-                "mindyou_logs.users.context_processors.allauth_settings",
+                "mock_logs.users.context_processors.allauth_settings",
             ],
         },
     },
@@ -234,7 +234,7 @@ EMAIL_TIMEOUT = 5
 # Django Admin URL.
 ADMIN_URL = "admin/"
 # https://docs.djangoproject.com/en/dev/ref/settings/#admins
-ADMINS = ['"Kier Abiad" <tech.intern.3@mindyou.com.ph>']
+ADMINS = ['"Developer" <developer@example.com>']
 # https://docs.djangoproject.com/en/dev/ref/settings/#managers
 MANAGERS = ADMINS
 # https://cookiecutter-django.readthedocs.io/en/latest/settings.html#other-environment-settings
@@ -319,13 +319,13 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 # https://docs.allauth.org/en/latest/account/configuration.html
-ACCOUNT_ADAPTER = "mindyou_logs.users.adapters.AccountAdapter"
+ACCOUNT_ADAPTER = "mock_logs.users.adapters.AccountAdapter"
 # https://docs.allauth.org/en/latest/account/forms.html
-ACCOUNT_FORMS = {"signup": "mindyou_logs.users.forms.UserSignupForm"}
+ACCOUNT_FORMS = {"signup": "mock_logs.users.forms.UserSignupForm"}
 # https://docs.allauth.org/en/latest/socialaccount/configuration.html
-SOCIALACCOUNT_ADAPTER = "mindyou_logs.users.adapters.SocialAccountAdapter"
+SOCIALACCOUNT_ADAPTER = "mock_logs.users.adapters.SocialAccountAdapter"
 # https://docs.allauth.org/en/latest/socialaccount/configuration.html
-SOCIALACCOUNT_FORMS = {"signup": "mindyou_logs.users.forms.UserSocialSignupForm"}
+SOCIALACCOUNT_FORMS = {"signup": "mock_logs.users.forms.UserSocialSignupForm"}
 
 # django-rest-framework
 # -------------------------------------------------------------------------------
@@ -345,8 +345,8 @@ CORS_URLS_REGEX = r"^/api/.*$"
 # By Default swagger ui is available only to admin user(s). You can change permission classes to change that
 # See more configuration options at https://drf-spectacular.readthedocs.io/en/latest/settings.html#settings
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Mind You Logs API",
-    "DESCRIPTION": "Documentation of API endpoints of Mind You Logs",
+    "TITLE": "Mock Logs API",
+    "DESCRIPTION": "Documentation of API endpoints of Mock Logs",
     "VERSION": "1.0.0",
     "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
     "SCHEMA_PATH_PREFIX": "/api/",

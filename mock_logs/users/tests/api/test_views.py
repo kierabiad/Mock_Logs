@@ -1,8 +1,8 @@
 import pytest
 from rest_framework.test import APIRequestFactory
 
-from mindyou_logs.users.api.views import UserViewSet
-from mindyou_logs.users.models import User
+from mock_logs.users.api.views import UserViewSet
+from mock_logs.users.models import User
 
 
 class TestUserViewSet:

@@ -29,7 +29,7 @@ from zipfile import ZIP_DEFLATED
 from zipfile import ZipFile
 from typing import Iterable
 
-ACUITY_EXPORT_HEADERS = [
+Primary_EXPORT_HEADERS = [
     "log_id",
     "session_id",
     "user_id",
@@ -44,7 +44,7 @@ ACUITY_EXPORT_HEADERS = [
     "error_code",
 ]
 
-ZOHO_EXPORT_HEADERS = [
+Secondary_EXPORT_HEADERS = [
     "log_id",
     "content",
     "method",
@@ -77,19 +77,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--populate",
         action="store_true",
-        help="Populate database before export (defaults: 9000 Acuity, 110000 Zoho)",
+        help="Populate database before export (defaults: 9000 Primary, 110000 Secondary)",
     )
     parser.add_argument(
-        "--acuity-count",
+        "--Primary-count",
         type=int,
         default=9000,
-        help="Acuity rows to generate when --populate is used (default: 9000)",
+        help="Primary rows to generate when --populate is used (default: 9000)",
     )
     parser.add_argument(
-        "--zoho-count",
+        "--Secondary-count",
         type=int,
         default=110000,
-        help="Zoho rows to generate when --populate is used (default: 110000)",
+        help="Secondary rows to generate when --populate is used (default: 110000)",
     )
     parser.add_argument(
         "--batch-size",
@@ -109,7 +109,7 @@ def parse_args() -> argparse.Namespace:
         dest="rows_per_csv",
         type=int,
         default=32000,
-        help="Rows per Acuity/Zoho CSV chunk (default: 32000)",
+        help="Rows per Primary/Secondary CSV chunk (default: 32000)",
     )
     parser.add_argument(
         "--max-zip-mb",
@@ -188,12 +188,12 @@ def populate_if_requested(args: argparse.Namespace) -> None:
 
     print(
         "Populating logs "
-        f"(Acuity={args.acuity_count}, Zoho={args.zoho_count}, batch={args.batch_size})..."
+        f"(Primary={args.Primary_count}, Secondary={args.Secondary_count}, batch={args.batch_size})..."
     )
     call_command(
         "populate_logs",
-        acuity_count=args.acuity_count,
-        zoho_count=args.zoho_count,
+        Primary_count=args.Primary_count,
+        Secondary_count=args.Secondary_count,
         batch_size=args.batch_size,
     )
 
@@ -205,62 +205,62 @@ def open_csv_writer(path: Path, headers: list[str]) -> tuple[object, csv.DictWri
     return fp, writer
 
 
-def run_acuity_logs(db_chunk_size: int) -> Iterable[object]:
-    from logs.models import AcuityLog
+def run_Primary_logs(db_chunk_size: int) -> Iterable[object]:
+    from logs.models import PrimaryLog
 
-    return AcuityLog.objects.select_related("user").order_by("id").iterator(
+    return PrimaryLog.objects.select_related("user").order_by("id").iterator(
         chunk_size=db_chunk_size
     )
 
 
-def run_zoho_logs(db_chunk_size: int) -> Iterable[object]:
-    from logs.models import ZohoLog
+def run_Secondary_logs(db_chunk_size: int) -> Iterable[object]:
+    from logs.models import SecondaryLog
 
-    return ZohoLog.objects.order_by("id").iterator(chunk_size=db_chunk_size)
+    return SecondaryLog.objects.order_by("id").iterator(chunk_size=db_chunk_size)
 
 
-def run_acuity_export(
+def run_Primary_export(
     *,
     logs: Iterable[object],
     output_dir: Path,
     timestamp: str,
     rows_per_csv: int,
 ) -> tuple[list[Path], int, Counter, Counter]:
-    acuity_paths: list[Path] = []
-    acuity_part = 1
-    acuity_rows_in_part = 0
-    acuity_fp = None
-    acuity_writer: csv.DictWriter | None = None
+    Primary_paths: list[Path] = []
+    Primary_part = 1
+    Primary_rows_in_part = 0
+    Primary_fp = None
+    Primary_writer: csv.DictWriter | None = None
     by_error = Counter()
     by_action = Counter()
     count = 0
 
-    def write_acuity_row(row: dict[str, str]) -> None:
-        nonlocal acuity_fp, acuity_writer, acuity_rows_in_part, acuity_part
-        if acuity_writer is None:
-            part_path = output_dir / f"acuity_logs_cleaned_{timestamp}_part_{acuity_part:03d}.csv"
-            acuity_fp, acuity_writer = open_csv_writer(part_path, ACUITY_EXPORT_HEADERS)
-            acuity_paths.append(part_path)
+    def write_Primary_row(row: dict[str, str]) -> None:
+        nonlocal Primary_fp, Primary_writer, Primary_rows_in_part, Primary_part
+        if Primary_writer is None:
+            part_path = output_dir / f"Primary_logs_cleaned_{timestamp}_part_{Primary_part:03d}.csv"
+            Primary_fp, Primary_writer = open_csv_writer(part_path, Primary_EXPORT_HEADERS)
+            Primary_paths.append(part_path)
 
-        if acuity_rows_in_part >= rows_per_csv:
-            assert acuity_fp is not None
-            acuity_fp.close()
-            acuity_part += 1
-            acuity_rows_in_part = 0
-            part_path = output_dir / f"acuity_logs_cleaned_{timestamp}_part_{acuity_part:03d}.csv"
-            acuity_fp, acuity_writer = open_csv_writer(part_path, ACUITY_EXPORT_HEADERS)
-            acuity_paths.append(part_path)
+        if Primary_rows_in_part >= rows_per_csv:
+            assert Primary_fp is not None
+            Primary_fp.close()
+            Primary_part += 1
+            Primary_rows_in_part = 0
+            part_path = output_dir / f"Primary_logs_cleaned_{timestamp}_part_{Primary_part:03d}.csv"
+            Primary_fp, Primary_writer = open_csv_writer(part_path, Primary_EXPORT_HEADERS)
+            Primary_paths.append(part_path)
 
-        assert acuity_writer is not None
-        acuity_writer.writerow(row)
-        acuity_rows_in_part += 1
+        assert Primary_writer is not None
+        Primary_writer.writerow(row)
+        Primary_rows_in_part += 1
 
     for log in logs:
         user_email = ""
         if log.user_id and getattr(log, "user", None):
             user_email = normalize_text(getattr(log.user, "email", ""))
 
-        acuity_row = {
+        Primary_row = {
             "log_id": str(log.id),
             "session_id": "",
             "user_id": str(log.user_id or ""),
@@ -275,55 +275,55 @@ def run_acuity_export(
             "error_code": normalize_error_code(log.error_code),
         }
 
-        write_acuity_row(acuity_row)
+        write_Primary_row(Primary_row)
         count += 1
-        by_error[("acuity", normalize_error_code(log.error_code))] += 1
+        by_error[("Primary", normalize_error_code(log.error_code))] += 1
         by_action[normalize_text(log.action)] += 1
 
-    if acuity_fp is not None:
-        acuity_fp.close()
+    if Primary_fp is not None:
+        Primary_fp.close()
 
-    return acuity_paths, count, by_error, by_action
+    return Primary_paths, count, by_error, by_action
 
 
-def run_zoho_export(
+def run_Secondary_export(
     *,
     logs: Iterable[object],
     output_dir: Path,
     timestamp: str,
     rows_per_csv: int,
 ) -> tuple[list[Path], int, Counter, Counter]:
-    zoho_paths: list[Path] = []
-    zoho_part = 1
-    zoho_rows_in_part = 0
-    zoho_fp = None
-    zoho_writer: csv.DictWriter | None = None
+    Secondary_paths: list[Path] = []
+    Secondary_part = 1
+    Secondary_rows_in_part = 0
+    Secondary_fp = None
+    Secondary_writer: csv.DictWriter | None = None
     by_error = Counter()
     by_method = Counter()
     count = 0
 
-    def write_zoho_row(row: dict[str, str]) -> None:
-        nonlocal zoho_fp, zoho_writer, zoho_rows_in_part, zoho_part
-        if zoho_writer is None:
-            part_path = output_dir / f"zoho_logs_cleaned_{timestamp}_part_{zoho_part:03d}.csv"
-            zoho_fp, zoho_writer = open_csv_writer(part_path, ZOHO_EXPORT_HEADERS)
-            zoho_paths.append(part_path)
+    def write_Secondary_row(row: dict[str, str]) -> None:
+        nonlocal Secondary_fp, Secondary_writer, Secondary_rows_in_part, Secondary_part
+        if Secondary_writer is None:
+            part_path = output_dir / f"Secondary_logs_cleaned_{timestamp}_part_{Secondary_part:03d}.csv"
+            Secondary_fp, Secondary_writer = open_csv_writer(part_path, Secondary_EXPORT_HEADERS)
+            Secondary_paths.append(part_path)
 
-        if zoho_rows_in_part >= rows_per_csv:
-            assert zoho_fp is not None
-            zoho_fp.close()
-            zoho_part += 1
-            zoho_rows_in_part = 0
-            part_path = output_dir / f"zoho_logs_cleaned_{timestamp}_part_{zoho_part:03d}.csv"
-            zoho_fp, zoho_writer = open_csv_writer(part_path, ZOHO_EXPORT_HEADERS)
-            zoho_paths.append(part_path)
+        if Secondary_rows_in_part >= rows_per_csv:
+            assert Secondary_fp is not None
+            Secondary_fp.close()
+            Secondary_part += 1
+            Secondary_rows_in_part = 0
+            part_path = output_dir / f"Secondary_logs_cleaned_{timestamp}_part_{Secondary_part:03d}.csv"
+            Secondary_fp, Secondary_writer = open_csv_writer(part_path, Secondary_EXPORT_HEADERS)
+            Secondary_paths.append(part_path)
 
-        assert zoho_writer is not None
-        zoho_writer.writerow(row)
-        zoho_rows_in_part += 1
+        assert Secondary_writer is not None
+        Secondary_writer.writerow(row)
+        Secondary_rows_in_part += 1
 
     for log in logs:
-        zoho_row = {
+        Secondary_row = {
             "log_id": str(log.id),
             "content": normalize_text(log.content),
             "method": normalize_text(log.method),
@@ -331,15 +331,15 @@ def run_zoho_export(
             "response": normalize_text(log.response),
             "error_code": normalize_error_code(log.error_code),
         }
-        write_zoho_row(zoho_row)
+        write_Secondary_row(Secondary_row)
         count += 1
-        by_error[("zoho", normalize_error_code(log.error_code))] += 1
+        by_error[("Secondary", normalize_error_code(log.error_code))] += 1
         by_method[normalize_text(log.method)] += 1
 
-    if zoho_fp is not None:
-        zoho_fp.close()
+    if Secondary_fp is not None:
+        Secondary_fp.close()
 
-    return zoho_paths, count, by_error, by_method
+    return Secondary_paths, count, by_error, by_method
 
 
 def export_cleaned_data(
@@ -350,39 +350,39 @@ def export_cleaned_data(
     output_dir.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
-    acuity_paths, acuity_count, acuity_by_error, by_action = run_acuity_export(
-        logs=run_acuity_logs(db_chunk_size),
+    Primary_paths, Primary_count, Primary_by_error, by_action = run_Primary_export(
+        logs=run_Primary_logs(db_chunk_size),
         output_dir=output_dir,
         timestamp=timestamp,
         rows_per_csv=rows_per_csv,
     )
-    zoho_paths, zoho_count, zoho_by_error, by_method = run_zoho_export(
-        logs=run_zoho_logs(db_chunk_size),
+    Secondary_paths, Secondary_count, Secondary_by_error, by_method = run_Secondary_export(
+        logs=run_Secondary_logs(db_chunk_size),
         output_dir=output_dir,
         timestamp=timestamp,
         rows_per_csv=rows_per_csv,
     )
 
     counters = {
-        "acuity": acuity_count,
-        "zoho": zoho_count,
+        "Primary": Primary_count,
+        "Secondary": Secondary_count,
     }
     by_error = Counter()
-    by_error.update(acuity_by_error)
-    by_error.update(zoho_by_error)
+    by_error.update(Primary_by_error)
+    by_error.update(Secondary_by_error)
     summary = {
         "timestamp": timestamp,
-        "acuity_rows": counters["acuity"],
-        "zoho_rows": counters["zoho"],
-        "total_rows": counters["acuity"] + counters["zoho"],
-        "acuity_parts": len(acuity_paths),
-        "zoho_parts": len(zoho_paths),
+        "Primary_rows": counters["Primary"],
+        "Secondary_rows": counters["Secondary"],
+        "total_rows": counters["Primary"] + counters["Secondary"],
+        "Primary_parts": len(Primary_paths),
+        "Secondary_parts": len(Secondary_paths),
         "top_errors": by_error.most_common(5),
         "top_actions": by_action.most_common(5),
         "top_methods": by_method.most_common(5),
     }
 
-    return acuity_paths, zoho_paths, summary
+    return Primary_paths, Secondary_paths, summary
 
 
 def zip_for_email(
@@ -456,14 +456,14 @@ def build_email_body(
         f"Part: {part_index}/{total_parts}",
         "",
         "Summary:",
-        f"- Acuity rows: {summary['acuity_rows']}",
-        f"- Zoho rows: {summary['zoho_rows']}",
+        f"- Primary rows: {summary['Primary_rows']}",
+        f"- Secondary rows: {summary['Secondary_rows']}",
         f"- Total rows: {summary['total_rows']}",
-        f"- Acuity CSV parts: {summary['acuity_parts']}",
-        f"- Zoho CSV parts: {summary['zoho_parts']}",
+        f"- Primary CSV parts: {summary['Primary_parts']}",
+        f"- Secondary CSV parts: {summary['Secondary_parts']}",
         _format_top_entries(summary["top_errors"], item_label="error codes"),
-        _format_top_entries(summary["top_actions"], item_label="acuity actions"),
-        _format_top_entries(summary["top_methods"], item_label="zoho methods"),
+        _format_top_entries(summary["top_actions"], item_label="Primary actions"),
+        _format_top_entries(summary["top_methods"], item_label="Secondary methods"),
     ]
     return "\n".join(lines)
 
@@ -485,7 +485,7 @@ def send_email(
             for idx, zip_path in enumerate(zip_paths, start=1):
                 msg = EmailMessage()
                 msg["Subject"] = (
-                    "MindYou Logs Export "
+                    "Mock Logs Export "
                     f"(cleaned+summary source-separated) part {idx}/{len(zip_paths)}"
                 )
                 msg["From"] = sender
@@ -547,26 +547,26 @@ def main() -> None:
 
     populate_if_requested(args)
 
-    acuity_paths, zoho_paths, summary = export_cleaned_data(
+    Primary_paths, Secondary_paths, summary = export_cleaned_data(
         output_dir=output_dir,
         db_chunk_size=args.db_chunk_size,
         rows_per_csv=args.rows_per_csv,
     )
 
     zip_paths = zip_for_email(
-        csv_paths=[*acuity_paths, *zoho_paths],
+        csv_paths=[*Primary_paths, *Secondary_paths],
         output_dir=output_dir,
         max_zip_bytes=max_zip_bytes,
         single_zip=args.single_zip,
         timestamp=summary["timestamp"],
     )
 
-    print(f"Acuity CSV parts: {len(acuity_paths)}")
-    print(f"Zoho CSV parts: {len(zoho_paths)}")
+    print(f"Primary CSV parts: {len(Primary_paths)}")
+    print(f"Secondary CSV parts: {len(Secondary_paths)}")
     print(f"Prepared zip parts for email: {len(zip_paths)}")
     print(
         "Row totals -> "
-        f"Acuity: {summary['acuity_rows']}, Zoho: {summary['zoho_rows']}"
+        f"Primary: {summary['Primary_rows']}, Secondary: {summary['Secondary_rows']}"
     )
 
     if not args.send_email:

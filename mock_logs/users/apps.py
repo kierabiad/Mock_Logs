@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class UsersConfig(AppConfig):
-    name = "mindyou_logs.users"
+    name = "mock_logs.users"
     verbose_name = _("Users")
 
     def ready(self):

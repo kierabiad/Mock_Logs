@@ -1,9 +1,9 @@
-"""Export Acuity logs to CSV.
+"""Export Primary logs to CSV.
 
 Usage examples:
-  python scripts/export_acuity_logs.py
-  python scripts/export_acuity_logs.py --output exports/acuity_logs.csv --limit 50000
-  docker compose -f docker-compose.local.yml exec django python scripts/export_acuity_logs.py
+  python scripts/export_Primary_logs.py
+  python scripts/export_Primary_logs.py --output exports/Primary_logs.csv --limit 50000
+  docker compose -f docker-compose.local.yml exec django python scripts/export_Primary_logs.py
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ from pathlib import Path
 
 def configure_django() -> None:
     project_root = Path(__file__).resolve().parents[1]
-    sys.path.append(str(project_root / "mindyou_logs"))
+    sys.path.append(str(project_root / "mock_logs"))
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
 
     import django
@@ -27,11 +27,11 @@ def configure_django() -> None:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Export Acuity logs to CSV")
+    parser = argparse.ArgumentParser(description="Export Primary logs to CSV")
     parser.add_argument(
         "--output",
         default="",
-        help="Output CSV file path (default: exports/acuity_logs_<timestamp>.csv)",
+        help="Output CSV file path (default: exports/Primary_logs_<timestamp>.csv)",
     )
     parser.add_argument(
         "--limit",
@@ -65,13 +65,13 @@ def resolve_output_path(raw_output: str) -> Path:
         output_path = Path(raw_output)
     else:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_path = Path("exports") / f"acuity_logs_{timestamp}.csv"
+        output_path = Path("exports") / f"Primary_logs_{timestamp}.csv"
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     return output_path
 
 
-def export_acuity_logs(
+def export_Primary_logs(
     output_path: Path,
     *,
     limit: int,
@@ -79,9 +79,9 @@ def export_acuity_logs(
     end_id: int,
     chunk_size: int,
 ) -> int:
-    from logs.models import AcuityLog
+    from logs.models import PrimaryLog
 
-    queryset = AcuityLog.objects.all().order_by("id")
+    queryset = PrimaryLog.objects.all().order_by("id")
 
     if start_id > 0:
         queryset = queryset.filter(id__gte=start_id)
@@ -136,7 +136,7 @@ def main() -> None:
 
     configure_django()
 
-    total = export_acuity_logs(
+    total = export_Primary_logs(
         output_path,
         limit=args.limit,
         start_id=args.start_id,
@@ -144,7 +144,7 @@ def main() -> None:
         chunk_size=args.chunk_size,
     )
 
-    print(f"Done. Exported {total} Acuity logs to: {output_path}")
+    print(f"Done. Exported {total} Primary logs to: {output_path}")
 
 
 if __name__ == "__main__":

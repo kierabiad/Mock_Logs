@@ -1,11 +1,11 @@
 [project]
-name = "mindyou_logs"
+name = "mock_logs"
 version = "0.1.0"
-description = "Mind You error log analyzer"
+description = "Mock Logs analyzer"
 readme = "README.md"
-license = { text = "Not open source" }
+license = { text = "MIT" }
 authors = [
-  { name = "Kier Abiad", email = "tech.intern.3@mindyou.com.ph" },
+  { name = "Mock Developer", email = "developer@example.com" },
 ]
 requires-python = "==3.13.*"
 classifiers = [
@@ -146,7 +146,7 @@ python_files = [
 # ==== Coverage ====
 
 [tool.coverage.run]
-include = [ "mindyou_logs/**" ]
+include = [ "mock_logs/**" ]
 omit = [ "*/migrations/*", "*/tests/*" ]
 plugins = [ "django_coverage_plugin" ]
 

@@ -1,7 +1,7 @@
 services:
   docs:
-    image: mindyou_logs_local_docs
-    container_name: mindyou_logs_local_docs
+    image: mock_logs_local_docs
+    container_name: mock_logs_local_docs
     build:
       context: .
       dockerfile: ./compose/local/docs/Dockerfile
@@ -11,7 +11,7 @@ services:
       - /app/.venv
       - ./docs:/docs:z
       - ./config:/app/config:z
-      - ./mindyou_logs:/app/mindyou_logs:z
+      - ./mock_logs:/app/mock_logs:z
     ports:
       - '9000:9000'
     command: /start-docs

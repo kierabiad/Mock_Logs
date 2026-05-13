@@ -1,4 +1,4 @@
-# Mind You Logs
+# Mock Logs
 
 A Django logging and analytics project with Docker, PostgreSQL, Redis, Celery, and factory_boy test data generation.
 
@@ -20,19 +20,13 @@ A Django logging and analytics project with Docker, PostgreSQL, Redis, Celery, a
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/kierabiad/mindyou_logs.git
-cd mindyou_logs
+git clone https://github.com/developer/mock_logs.git
+cd mock_logs
 ```
 
 ### 2. Create the local Gmail secret file
 
 Create the local file and fill in real values on your machine only.
-
-```bash
-copy NUL .envs\.local\.gmail
-```
-
-On macOS or Linux, use:
 
 ```bash
 touch .envs/.local/.gmail
@@ -102,7 +96,7 @@ docker compose -f docker-compose.local.yml exec django python export_consolidate
 ```
 
 Notes:
-- Acuity and Zoho logs are exported separately.
+- Logs are exported separately by source.
 - CSV chunks default to 32,000 rows.
 - The email body contains the summary.
 - The script will use your local `.envs/.local/.gmail` file automatically.
@@ -118,7 +112,7 @@ docker compose -f docker-compose.local.yml exec django python export_consolidate
 This project uses PostgreSQL as the database and uses factory_boy to generate dummy logs.
 
 ```bash
-docker compose -f docker-compose.local.yml exec django python manage.py populate_logs --acuity-count 9000 --zoho-count 110000 --batch-size 1000
+docker compose -f docker-compose.local.yml exec django python manage.py populate_logs --Primary-count 9000 --Secondary-count 110000 --batch-size 1000
 ```
 
 ## Service Notes

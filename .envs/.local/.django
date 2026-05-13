@@ -10,4 +10,4 @@ DJANGO_SETTINGS_MODULE=config.settings.local
 DJANGO_SECRET_KEY=your-secret-key
 DJANGO_DEBUG=True
 
-DATABASE_URL=postgres://postgres:postgres@postgres:5432/mindyou_logs
+DATABASE_URL=postgres://postgres:postgres@postgres:5432/mock_logs

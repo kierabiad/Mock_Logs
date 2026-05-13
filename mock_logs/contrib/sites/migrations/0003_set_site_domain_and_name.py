@@ -41,7 +41,7 @@ def update_site_forward(apps, schema_editor):
         Site,
         schema_editor.connection,
         "localhost",
-        "Mind You Logs",
+        "Mock Logs",
     )
 
 

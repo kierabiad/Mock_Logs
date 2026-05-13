@@ -4,7 +4,7 @@ import django.utils.timezone
 from django.db import migrations
 from django.db import models
 
-import mindyou_logs.users.models
+import mock_logs.users.models
 
 
 class Migration(migrations.Migration):
@@ -106,7 +106,7 @@ class Migration(migrations.Migration):
                 "abstract": False,
             },
             managers=[
-                ("objects", mindyou_logs.users.models.UserManager()),
+                ("objects", mock_logs.users.models.UserManager()),
             ],
         ),
     ]

@@ -14,9 +14,9 @@ services:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
 
-    image: mindyou_logs_production_django
+    image: mock_logs_production_django
     volumes:
-      - production_django_media:/app/mindyou_logs/media
+      - production_django_media:/app/mock_logs/media
     depends_on:
       - postgres
       - redis
@@ -29,7 +29,7 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
-    image: mindyou_logs_production_postgres
+    image: mock_logs_production_postgres
     volumes:
       - production_postgres_data:/var/lib/postgresql/data
       - production_postgres_data_backups:/backups
@@ -40,7 +40,7 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/traefik/Dockerfile
-    image: mindyou_logs_production_traefik
+    image: mock_logs_production_traefik
     depends_on:
       - django
     volumes:
@@ -59,24 +59,24 @@ services:
 
   celeryworker:
     <<: *django
-    image: mindyou_logs_production_celeryworker
+    image: mock_logs_production_celeryworker
     command: /start-celeryworker
 
   celerybeat:
     <<: *django
-    image: mindyou_logs_production_celerybeat
+    image: mock_logs_production_celerybeat
     command: /start-celerybeat
 
   flower:
     <<: *django
-    image: mindyou_logs_production_flower
+    image: mock_logs_production_flower
     command: /start-flower
 
   nginx:
     build:
       context: .
       dockerfile: ./compose/production/nginx/Dockerfile
-    image: mindyou_logs_production_nginx
+    image: mock_logs_production_nginx
     depends_on:
       - django
     volumes:

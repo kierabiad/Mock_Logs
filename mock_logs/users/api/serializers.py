@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from mindyou_logs.users.models import User
+from mock_logs.users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer[User]):
